@@ -1,7 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
-import { useAnimatedReaction } from 'react-native-reanimated';
+import * as bcrypt from 'bcrypt';
+
 
 @Injectable()
 export class AuthService {
@@ -10,16 +11,32 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
+
+    async register(userData: {
+        username: string;
+        password: string;
+        email: string;
+        name: string;
+        role_id: number;
+    }) {
+        return this.usersService.create(userData);
+    }
+
     async signIn(username: string, password: string): Promise<{ jwt_token: string }> {
-        const user = await this.usersService.findOne(username);
+        const user = await this.usersService.findOneUser(username);
 
         // Check if user exists and matches password
-        if (user?.password !== password) {
+        if (!user) {
+            throw new UnauthorizedException();
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
             throw new UnauthorizedException();
         }
 
         const payload = {
-            sub: user.userId,
+            sub: user.id,
             username: user.username
         };
 

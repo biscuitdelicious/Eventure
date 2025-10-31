@@ -1,11 +1,11 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Artist {
@@ -14,7 +14,7 @@ model Artist {
   surname        String?
   genre          String?
   contact_info   String?
-  available_date DateTime[]
+  available_date String?
   event_id       Int
   event          Event      @relation(fields: [event_id], references: [id])
 

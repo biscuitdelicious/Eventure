@@ -1,5 +1,5 @@
 export const jwtConstants = {
-    secretKey: process.env.JWT_SECRET_KEY,
+    secret: process.env.JWT_SECRET_KEY || 'iBHSDG&^#bnbubyd&^T3nsad',
 };
 
 // TODO: Fix the ERROR [ExceptionsHandler] secretOrPrivateKey must have a value
