@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Artist {
+  id             Int     @id @default(autoincrement())
+  name           String
+  surname        String?
+  genre          String?
+  contact_info   String?
+  available_date String?
+  event_id       Int
+  event          Event   @relation(fields: [event_id], references: [id])
+
+  @@map("artist")
+}
+
+model Event {
+  id           Int         @id @default(autoincrement())
+  name         String
+  location     String?
+  forecast     String?     @default("Sunny")
+  start_date   DateTime
+  end_date     DateTime
+  event_status EventStatus @default(PLANNING)
+  budget       Decimal?
+  artists      Artist[]
+  resources    Resource[]
+
+  @@map("event")
+}
+
+model Resource {
+  id       Int     @id @default(autoincrement())
+  name     String
+  rented   Boolean @default(false) @map("rented_equipment")
+  quantity Int     @default(1)
+  event_id Int
+  event    Event   @relation(fields: [event_id], references: [id])
+
+  @@map("resource")
+}
+
+model Role {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  staff Staff[]
+
+  @@index([name])
+  @@map("roles")
+}
+
+model Staff {
+  id         Int      @id @default(autoincrement())
+  name       String
+  username   String?  @unique
+  password   String
+  created_at DateTime @default(now())
+  phone      String?  @ignore
+  email      String?  @unique
+  role_id    Int
+  roles      Role     @relation(fields: [role_id], references: [id])
+
+  @@map("staff")
+}
+
+enum EventStatus {
+  PLANNING
+  SETUP
+  LIVE
+  COMPLETED
+  CANCELED
+}
